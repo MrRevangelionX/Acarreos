@@ -2,8 +2,6 @@ package com.jp.controlacarreos;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -11,14 +9,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
-
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
@@ -27,8 +21,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
@@ -56,51 +48,42 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         txtQuery = findViewById(R.id.txtQuery);
         String url = "http://192.168.140.15:8080/Desarrollos/ControlAcarreos/info/sucursales.php";
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
-                url, null, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    JSONArray jsonArray = response.getJSONArray("sucursales");
-                    for(int i=0; i<jsonArray.length();i++){
-                        JSONObject jsonObject = jsonArray.getJSONObject(i);
-                        countryCode = jsonObject.optString("codsucursal");
-                        countryName = jsonObject.optString("nomsucursal");
-                        countryList.add(countryCode + " - " + countryName);
-                        countryAdapter = new ArrayAdapter<>(MainActivity.this,
-                                android.R.layout.simple_spinner_item, countryList);
-                        countryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                        spinnerCountry.setAdapter(countryAdapter);
+                url, null, response -> {
+                    try {
+                        JSONArray jsonArray = response.getJSONArray("sucursales");
+                        for(int i=0; i<jsonArray.length();i++){
+                            JSONObject jsonObject = jsonArray.getJSONObject(i);
+                            countryCode = jsonObject.optString("codsucursal");
+                            countryName = jsonObject.optString("nomsucursal");
+                            countryList.add(countryCode + " - " + countryName);
+                            countryAdapter = new ArrayAdapter<>(MainActivity.this,
+                                    android.R.layout.simple_spinner_item, countryList);
+                            countryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                            spinnerCountry.setAdapter(countryAdapter);
 
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
+                }, error -> {
 
-            }
-        });
+                });
         requestQueue.add(jsonObjectRequest);
         spinnerCountry.setOnItemSelectedListener(this);
 
         final internalDB internaldb = new internalDB(getApplicationContext());
 
-        btnInsertar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String scanner = txtScan.getText().toString();
-                String [] arrScan = scanner.split(",");
+        btnInsertar.setOnClickListener(view -> {
+            String scanner = txtScan.getText().toString();
+            String [] arrScan = scanner.split(",");
 
-                try {
-                    internaldb.agregarCheckpoint(9,codeSucursal[0].toString(),codeProyecto[0].toString(),arrScan[0].toString(), arrScan[1].toString(), arrScan[2].toString());
-                    Toast.makeText(getApplicationContext(), "Se fueron los datos", Toast.LENGTH_SHORT).show();
-                }catch (Exception ex){
-                    ex.printStackTrace();
-                }
-                txtScan.setText("");
+            try {
+                internaldb.agregarCheckpoint(9,codeSucursal[0],codeProyecto[0],arrScan[0], arrScan[1], arrScan[2]);
+                Toast.makeText(getApplicationContext(), "Se fueron los datos", Toast.LENGTH_SHORT).show();
+            }catch (Exception ex){
+                ex.printStackTrace();
             }
+            txtScan.setText("");
         });
 
     }
@@ -114,32 +97,26 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             String url = "http://192.168.140.15:8080/Desarrollos/ControlAcarreos/info/proyectos.php?sucursal="+codeSucursal[0];
             requestQueue = Volley.newRequestQueue(this);
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
-                    url, null, new Response.Listener<JSONObject>() {
-                @Override
-                public void onResponse(JSONObject response) {
-                    try {
-                        JSONArray jsonArray = response.getJSONArray("proyectos");
-                        for(int i=0; i<jsonArray.length();i++){
-                            JSONObject jsonObject = jsonArray.getJSONObject(i);
-                            cityCode = jsonObject.optString("codproyecto");
-                            cityName = jsonObject.optString("nomproyecto");
-                            cityList.add(cityCode + " - " + cityName);
-                            cityAdapter = new ArrayAdapter<>(MainActivity.this,
-                                    android.R.layout.simple_spinner_item, cityList);
-                            cityAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                            spinnerCity.setAdapter(cityAdapter);
+                    url, null, response -> {
+                        try {
+                            JSONArray jsonArray = response.getJSONArray("proyectos");
+                            for(int i1 = 0; i1 <jsonArray.length(); i1++){
+                                JSONObject jsonObject = jsonArray.getJSONObject(i1);
+                                cityCode = jsonObject.optString("codproyecto");
+                                cityName = jsonObject.optString("nomproyecto");
+                                cityList.add(cityCode + " - " + cityName);
+                                cityAdapter = new ArrayAdapter<>(MainActivity.this,
+                                        android.R.layout.simple_spinner_item, cityList);
+                                cityAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                spinnerCity.setAdapter(cityAdapter);
 
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
+                    }, error -> {
 
-                }
-            });
+                    });
             requestQueue.add(jsonObjectRequest);
             spinnerCity.setOnItemSelectedListener(this);
         }
