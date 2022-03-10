@@ -9,8 +9,7 @@ import java.util.Calendar;
 
 public class internalDB extends SQLiteOpenHelper {
 
-    String query, consult;
-    String [] tRegistros;
+    String query;
 
     private static final String dbName = "WebApps";
     private static final int dbVersion = 1;
