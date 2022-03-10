@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">ControlAcarreos</string>
+    <string name="nomProyecto">Control de Acarreos</string>
+    <string name="txtSucursales">Sucursal:</string>
+    <string name="txtProyectos">Proyecto:</string>
+</resources>
