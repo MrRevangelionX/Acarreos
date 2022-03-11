@@ -12,9 +12,9 @@ public class internalDB extends SQLiteOpenHelper {
     String query;
 
     private static final String dbName = "WebApps";
-    private static final int dbVersion = 1;
+    private static final int dbVersion = 5;
     private static final String dbTablaName = "wapp_acarreos";
-    private static final String dbTablaQuery = "CREATE TABLE wapp_Acarreos(_id INTEGER PRIMARY KEY AUTOINCREMENT,codempresa INTEGER, codsucursal TEXT, codproyecto TEXT, transOwner TEXT, transPlate TEXT, transCapacity TEXT, checkpoint TEXT, sync INTEGER)";
+    private static final String dbTablaQuery = "CREATE TABLE wapp_Acarreos(id INTEGER PRIMARY KEY AUTOINCREMENT,codempresa TEXT, codsucursal TEXT, codproyecto TEXT, transOwner TEXT, transPlate TEXT, transCapacity TEXT, checkpoint TEXT, sync INTEGER)";
 
     public internalDB(Context context) {
         super(context, dbName, null, dbVersion);
@@ -31,7 +31,7 @@ public class internalDB extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL(dbTablaQuery);
     }
 
-    public void agregarCheckpoint(int cEmpresa, String cSucursal, String cProyecto, String tOwner, String tPlate, String tCapacity){
+    public void agregarCheckpoint(String cEmpresa, String cSucursal, String cProyecto, String tOwner, String tPlate, String tCapacity){
         SQLiteDatabase db = getWritableDatabase();
         if (db != null){
             try {

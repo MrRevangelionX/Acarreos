@@ -1,6 +1,7 @@
 package com.jp.controlacarreos;
 
 import android.graphics.Color;
+import android.inputmethodservice.Keyboard;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -34,6 +35,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     RequestQueue requestQueue;
     String countryCode, countryName, cityCode, cityName;
     String [] codeSucursal, codeProyecto;
+    String HOST_ADDRESS = "http://192.168.0.3:8080";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         btnInsertar = findViewById(R.id.btnInsertar);
         txtScan = findViewById(R.id.txtScan);
         txtQuery = findViewById(R.id.txtQuery);
-        String url = "http://192.168.140.15:8080/Desarrollos/ControlAcarreos/info/sucursales.php";
+        String url = HOST_ADDRESS + "/Desarrollos/ControlAcarreos/info/sucursales.php";
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
                 url, null, response -> {
                     try {
@@ -78,12 +80,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             String [] arrScan = scanner.split(",");
 
             try {
-                internaldb.agregarCheckpoint(9,codeSucursal[0],codeProyecto[0],arrScan[0], arrScan[1], arrScan[2]);
-                Toast.makeText(getApplicationContext(), "Se fueron los datos", Toast.LENGTH_SHORT).show();
+                internaldb.agregarCheckpoint("9",codeSucursal[0],codeProyecto[0],arrScan[0], arrScan[1], arrScan[2]);
+                Toast.makeText(getApplicationContext(), R.string.dataGuardada, Toast.LENGTH_SHORT).show();
             }catch (Exception ex){
                 ex.printStackTrace();
             }
             txtScan.setText("");
+            txtScan.requestFocus();
         });
 
     }
@@ -94,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             cityList.clear();
             String selectedCountry = adapterView.getSelectedItem().toString();
             codeSucursal = selectedCountry.split(" ");
-            String url = "http://192.168.140.15:8080/Desarrollos/ControlAcarreos/info/proyectos.php?sucursal="+codeSucursal[0];
+            String url = HOST_ADDRESS + "/Desarrollos/ControlAcarreos/info/proyectos.php?sucursal="+codeSucursal[0];
             requestQueue = Volley.newRequestQueue(this);
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
                     url, null, response -> {
@@ -137,5 +140,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         btnInsertar.setVisibility(View.VISIBLE);
         String selectedCity = spinnerCity.getSelectedItem().toString();
         codeProyecto = selectedCity.split(" ");
+        txtScan.requestFocus();
     }
 }

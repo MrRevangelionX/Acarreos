@@ -3,4 +3,9 @@
     <string name="nomProyecto">Control de Acarreos</string>
     <string name="txtSucursales">Sucursal:</string>
     <string name="txtProyectos">Proyecto:</string>
+    <string name="dataGuardada">Datos Almacenados Correctamente</string>
+    <string name="logoDescripcion">Global Developers Logo</string>
+    <string name="btnListo">LISTO</string>
+    <string name="txtQRHint">Escanee Código QR</string>
+    <string name="btnInsertar">INSERTAR</string>
 </resources>
