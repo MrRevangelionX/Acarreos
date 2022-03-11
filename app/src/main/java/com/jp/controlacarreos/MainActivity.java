@@ -1,7 +1,7 @@
 package com.jp.controlacarreos;
 
 import android.graphics.Color;
-import android.inputmethodservice.Keyboard;
+import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -22,6 +22,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
@@ -33,9 +36,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     ArrayAdapter<String> countryAdapter;
     ArrayAdapter<String> cityAdapter;
     RequestQueue requestQueue;
-    String countryCode, countryName, cityCode, cityName;
-    String [] codeSucursal, codeProyecto;
-    String HOST_ADDRESS = "http://192.168.140.15:8080";
+    String countryCode, countryName, cityCode, cityName, scanner;
+    String [] codeSucursal, codeProyecto, arrScan;
+    String HOST_ADDRESS = "http://192.168.21.2:8080";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         btnInsertar = findViewById(R.id.btnInsertar);
         txtScan = findViewById(R.id.txtScan);
         txtQuery = findViewById(R.id.txtQuery);
-        String url = HOST_ADDRESS + "/Desarrollos/ControlAcarreos/info/sucursales.php";
+        String url = HOST_ADDRESS + "/ControlAcarreos/info/sucursales.php";
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
                 url, null, response -> {
                     try {
@@ -76,8 +79,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         final internalDB internaldb = new internalDB(getApplicationContext());
 
         btnInsertar.setOnClickListener(view -> {
-            String scanner = txtScan.getText().toString();
-            String [] arrScan = scanner.split(",");
+            scanner = txtScan.getText().toString();
+            arrScan = scanner.split(",");
 
             try {
                 internaldb.agregarCheckpoint("9",codeSucursal[0],codeProyecto[0],arrScan[0], arrScan[1], arrScan[2]);
@@ -85,6 +88,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }catch (Exception ex){
                 ex.printStackTrace();
             }
+            syncSQL();
             txtScan.setText("");
             txtScan.requestFocus();
         });
@@ -97,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             cityList.clear();
             String selectedCountry = adapterView.getSelectedItem().toString();
             codeSucursal = selectedCountry.split(" ");
-            String url = HOST_ADDRESS + "/Desarrollos/ControlAcarreos/info/proyectos.php?sucursal="+codeSucursal[0];
+            String url = HOST_ADDRESS + "/ControlAcarreos/info/proyectos.php?sucursal="+codeSucursal[0];
             requestQueue = Volley.newRequestQueue(this);
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
                     url, null, response -> {
@@ -141,5 +145,40 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         String selectedCity = spinnerCity.getSelectedItem().toString();
         codeProyecto = selectedCity.split(" ");
         txtScan.requestFocus();
+    }
+
+    public void syncSQL(){
+        String url = HOST_ADDRESS + "/ControlAcarreos/sync/insertuser.php";
+        JSONObject parametros = new JSONObject();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        String ahorita = sdf.format(new Date());
+
+        try {
+            parametros.put("codempresa","9");
+            parametros.put("codsucursal",codeSucursal[0]);
+            parametros.put("codproyecto",codeProyecto[0]);
+            parametros.put("transOwner",arrScan[0]);
+            parametros.put("transPlate",arrScan[1]);
+            parametros.put("transCapacity",arrScan[2]);
+            parametros.put("checkpoint",ahorita);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
+                url, parametros, response -> {
+            try {
+                JSONArray jsonArray = response.getJSONArray("sucursales");
+                for(int i=0; i<jsonArray.length();i++){
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    countryCode = jsonObject.optString("codsucursal");
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }, error -> {
+
+        });
+        requestQueue.add(jsonObjectRequest);
     }
 }

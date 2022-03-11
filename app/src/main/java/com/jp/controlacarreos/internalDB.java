@@ -3,13 +3,13 @@ package com.jp.controlacarreos;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.icu.text.SimpleDateFormat;
 import android.util.Log;
-
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 public class internalDB extends SQLiteOpenHelper {
-
-    String query;
 
     private static final String dbName = "WebApps";
     private static final int dbVersion = 1;
@@ -35,8 +35,9 @@ public class internalDB extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
         if (db != null){
             try {
-                String currentTime = Calendar.getInstance().getTime().toString();
-                query = "INSERT INTO wapp_acarreos VALUES (NULL,'"+cEmpresa+"','"+cSucursal+"','"+cProyecto+"','" + tOwner + "','" + tPlate + "','" + tCapacity + "','" + currentTime + "',0)";
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                String ahorita = sdf.format(new Date());
+                String query = "INSERT INTO wapp_acarreos VALUES (NULL,'" + cEmpresa + "','" + cSucursal + "','" + cProyecto + "','" + tOwner + "','" + tPlate + "','" + tCapacity + "','" + ahorita + "',0)";
                 Log.d("------------------Query: ", query);
                 db.execSQL(query);
             }catch (Exception exception){
