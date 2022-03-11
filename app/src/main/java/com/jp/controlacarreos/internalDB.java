@@ -12,7 +12,7 @@ public class internalDB extends SQLiteOpenHelper {
     String query;
 
     private static final String dbName = "WebApps";
-    private static final int dbVersion = 5;
+    private static final int dbVersion = 1;
     private static final String dbTablaName = "wapp_acarreos";
     private static final String dbTablaQuery = "CREATE TABLE wapp_Acarreos(id INTEGER PRIMARY KEY AUTOINCREMENT,codempresa TEXT, codsucursal TEXT, codproyecto TEXT, transOwner TEXT, transPlate TEXT, transCapacity TEXT, checkpoint TEXT, sync INTEGER)";
 
