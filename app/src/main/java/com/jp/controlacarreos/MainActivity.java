@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     RequestQueue requestQueue;
     String countryCode, countryName, cityCode, cityName, scanner;
     String [] codeSucursal, codeProyecto, arrScan;
-    String HOST_ADDRESS = "http://192.168.21.2:8080";
+    String HOST_ADDRESS = "http://168.243.90.35:8080";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
